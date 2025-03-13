@@ -70,11 +70,13 @@ services:
         PORTAINER_PASSWORD: ${ADMIN_PASS}
     volumes:
       # - /var/run/docker.sock:/var/run/docker.sock     # Allows the container to access the Docker daemon
-      - /run/user/104347/docker.sock:/var/run/docker.sock  # change number 104347 to user id
+      - /run/user/${UID}/docker.sock:/var/run/docker.sock  # change number 104347 to user id
       - portainer_data:/data
     networks:
       - pong-net                                      # Network connecting all containers
     restart: always                                   # Restart container in case of failure
+    environment:
+      - UID=${UID}  # Pasar UID como variable de entorno
 
   # cAdvisor (8080)
   cadvisor:
@@ -85,12 +87,14 @@ services:
       - /sys:/sys:ro                                  # Acceso al sistema de archivos sys
       - /var/run:/var/run:ro                          # Acceso a la información de contenedores
       - /var/lib/docker/:/var/lib/docker:ro           # Acceso a los datos de Docker
-      - /run/user/104347/docker.sock:/var/run/docker.sock
+      - /run/user/${UID}/docker.sock:/var/run/docker.sock
     ports:
       - "8090:8080"
     networks:
       - pong-net                                      # Network connecting all containers
     restart: always                                   # Restart container in case of failure
+    environment:
+      - UID=${UID}  # Pasar UID como variable de entorno
 
 
 # ------------------- LOGGING ------------------ #
