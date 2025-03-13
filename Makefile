@@ -13,6 +13,7 @@ all: up
 up:
 	@$(DOCKER_COMPOSE) $(DC) up -d || exit 1
 	@printf "\n"
+	@cat doc/enter.txt || exit 1
 
 # Removes containers
 down:
@@ -90,6 +91,12 @@ _remove:
 	@docker rmi srcs-grafana > /dev/null 2>&1 || true
 	@docker rmi srcs-prometheus > /dev/null 2>&1 || true
 	@docker rmi srcs-service1 > /dev/null 2>&1 || true
+
+nuke:
+	fcclean _remove
+
+re:
+	nuke all
 
 .PHONY: all up down restart build rebuild clean vclean fclean fcclean _remove nuke
 
