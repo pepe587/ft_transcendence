@@ -1,0 +1,11 @@
+groups:
+  - name: Nginx
+    rules:
+      - alert: HighActiveConnections
+        expr: nginx_connections_active > 100
+        for: 60s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active connections on Nginx"
+          description: "Nginx has over 100 active connections for more than 1 minute."

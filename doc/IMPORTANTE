@@ -1,0 +1,58 @@
+Para crear un nuevo Micro-Servicio hacer estos pasos:
+
+1º - Crear la carpeta dentro de "backend" con el nombre del microservicio.
+2º - Copiar el contenido de "template" dentro a la carpeta que has creado.
+3º - Cambiar en "entrypoint.sh", [microservice] por el nombre del microservicio.
+4º - Cambiar el nombre y el contenido de "[microservice].conf", sustituyendo [microservice] por el nombre del microservicio y moverlo a "nginx/microservices/".
+5º - Añadir a "docker-compose.yml" lo siguiente:
+
+        [microservice]:                         # Sustituir [microservice] por el nombre del microservicio
+          container_name: [microservice]        # Sustituir [microservice] por el nombre del microservicio
+          env_file: .env
+          build:
+            context: ./backend/[microservice]   # Sustituir [microservice] por el nombre del microservicio
+            dockerfile: Dockerfile
+          volumes:
+            - ./backend/[microservice]:/app     # Sustituir [microservice] por el nombre del microservicio
+          ports:
+            - "800X:8000"                       # Sustituir X por el numero de microservicio (comprobar en "docker-compose.yml")
+            - "900X:9000"                       # Sustituir X por el numero de microservicio (comprobar en "docker-compose.yml")
+          networks:
+            - pong-net
+          depends_on:
+            - db
+
+6º - Añadir el nombre del microservicio a las dependendicas de "nginx" en "docker-compose.yml".
+7º - Ya puede levantarlo todo con "make" o hacer "make down build up".
+8º - Para comprobar que funciona correctamente, acceder a "http://localhost:800X/" o "http://localhost:900X/".  # Sustituir X por el numero de microservicio (comprobar en "docker-compose.yml")
+9º - Para poder acceder a traves de nginx usando la ruta con https y no directamente al contenedor, crear el archivo "views.py" en la carpeta donde estan todos los demas .py (settings.py, etc.).
+10º - Añadir lo siguiente al archivo "views.py":
+
+        from django.http import JsonResponse
+
+        def home(request):
+            return JsonResponse({'message': 'Hello from Django!'})
+
+11º - Modificar "urls.py" con lo siguiente:
+       
+        from django.contrib import admin
+        from django.urls import path
+        from [microservice] import views                          # Sustituir [microservice] por el nombre del microservicio
+
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+          path('api/[microservice]/', views.home, name='home'),   # Sustituir [microservice] por el nombre del microservicio
+        ]
+
+12º - Ya puede acceder a traves de "https://localhost/api/[microservice]/" o "https://localhost/ws/[microservice]/" y probar que funciona.
+
+NOTAS:
+
+Los microservicios no envian código html, generalmente envian informacion JSON a traves de API requests o en el caso de WebSockets, informacion, como puede ser la posicion de la pelota, paletas, chat, etc.
+
+Estas instrucciones son solamente para configurar un nuevo proyecto que funcione con nginx, tenga conexion con la base de datos y utilice HTTPS tanto para las solicitudes a la API y a traves de WebSockets.
+
+Pueden haber cosas que estén mal, pero para tener una base por donde empezar creo que puede funcionar.
+
+Dentro de la carpeta "doc" hay un archivo de texto con muchos comandos utiles.
+

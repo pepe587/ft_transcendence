@@ -1,0 +1,61 @@
+Usuarios
+---------
+- id (PK)                  -> Identificador único de usuario.
+- username                 -> Nombre de usuario (único).
+- email                    -> Correo electrónico.
+- email_verified           -> Correo electrónico verificado.
+- password_hash            -> Hash de la contraseña (si se requiere contraseña adicional).
+- oauth_provider           -> Proveedor OAuth (por ejemplo, "42" para autenticación de la escuela 42).
+- oauth_id                 -> ID del usuario en el proveedor OAuth.
+- two_factor_enabled       -> Booleano, indica si 2FA está habilitado.
+- two_factor_secret        -> Clave secreta para 2FA (almacenada de forma segura).
+- token                    -> Token de autenticación actual (puede ser JWT o similar).
+- last_login               -> Fecha y hora del último inicio de sesión.
+- created_at               -> Fecha de creación de la cuenta.
+- updated_at               -> Fecha de última actualización.
+
+Perfiles
+---------
+- id (PK)                  -> Identificador único del perfil.
+- user_id (FK)             -> Relación con Usuarios.id (clave foránea).
+- login_42 (opcional)      -> Login del usuario en 42.
+- first_name (opcional)    -> Nombre del usuario.
+- last_name (opcional)     -> Apellido(s) del usuario.
+- birth_date (opcional)    -> Fecha de nacimiento.
+- joined_at                -> Fecha de creación del perfil (se genera automáticamente).
+- profile_picture          -> URL de la imagen de perfil, puede ser una imagen por defecto.
+
+
+
+accounts/                   # Proyecto principal
+├── aauth/                  # App para autenticación básica
+│   ├── views.py
+│   ├── serializers.py
+│   ├── urls.py
+│   └── tokens.py
+│
+├── oauth/                  # App para autenticación externa (OAuth 2.0)
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+│
+├── profile/                # App para gestión de perfil de usuario
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+│
+├── two_factor_auth/        # App para la autenticación en dos pasos (2FA)
+│   ├── views.py
+│   ├── serializers.py
+│   ├── urls.py
+│   └── utils.py
+│
+├── core/			        # App general con los modelos de las tablas
+│   └── models.py
+│
+├── accounts/               # Configuración del proyecto principal
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py             # Rutas principales del proyecto
+│   └── wsgi.py
+└── manage.py

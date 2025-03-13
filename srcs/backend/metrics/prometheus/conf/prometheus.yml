@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - /etc/prometheus/rules_elasticsearch.yaml
+  - /etc/prometheus/rules_postgre.yaml
+  - /etc/prometheus/alerts.yaml
+
+scrape_configs:
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+  - job_name: 'postgre'
+    static_configs:
+      - targets: ['postgre:9187']
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['elasticsearch:9114']
+  - job_name: 'service1'
+    static_configs:
+      - targets: ['service1:8000']
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"

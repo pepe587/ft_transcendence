@@ -1,0 +1,109 @@
+Docker
+------
+
+docker --version				Verificar la versión de Docker instalada
+docker ps					Listar contenedores en ejecución
+docker ps -a					Listar todos los contenedores (incluidos detenidos)
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]	Ejecutar un nuevo contenedor
+docker stop CONTAINER_ID			Detener un contenedor en ejecución
+docker rm CONTAINER_ID				Eliminar un contenedor
+docker images					Listar imágenes disponibles en el sistema
+docker rmi IMAGE_ID				Eliminar una imagen
+docker logs CONTAINER_ID			Ver los registros de un contenedor
+docker exec -it CONTAINER_ID COMMAND		Ejecutar un comando en un contenedor en ejecución
+docker stats					Ver el estado de los recursos (uso de CPU, memoria, etc.)
+docker-compose --version			Verificar la versión de Docker Compose instalada
+docker-compose up				Iniciar servicios definidos en el archivo docker-compose
+docker-compose up -d				Iniciar servicios en segundo plano (detached)
+docker-compose down				Detener y eliminar servicios definidos en docker-compose
+docker-compose restart				Reiniciar servicios definidos en docker-compose
+docker-compose logs				Ver los registros de los servicios definidos en docker-compose
+docker-compose build				Construir o reconstruir servicios definidos en docker-compose
+docker-compose ps				Listar servicios en ejecución definidos en docker-compose
+docker-compose exec SERVICE COMMAND		Ejecutar un comando en un servicio definido en docker-compose
+docker-compose top				Ver el estado de los recursos de los servicios
+docker-compose down --rmi all			Detener y eliminar servicios junto con las imágenes
+
+
+PostgreSQL
+----------
+
+psql -U user -d database_name						Conectar a una base de datos específica como un usuario
+\l									Listar todas las bases de datos
+\c database_name							Conectarse a una base de datos específica
+CREATE DATABASE database_name;						Crear una nueva base de datos
+DROP DATABASE database_name;						Eliminar una base de datos
+CREATE TABLE table_name (column1 datatype, ...);			Crear una nueva tabla en la base de datos
+DROP TABLE table_name;							Eliminar una tabla de la base de datos
+\d									Listar todas las tablas de la base de datos
+\d table_name								Ver la estructura de una tabla específica
+INSERT INTO table_name (column1, column2) VALUES (value1, value2);	Insertar una nueva fila en una tabla
+SELECT * FROM table_name;						Seleccionar todas las filas de una tabla
+UPDATE table_name SET column1 = value1 WHERE condition;			Actualizar filas en una tabla
+DELETE FROM table_name WHERE condition;					Eliminar filas de una tabla
+\q									Salir del cliente de línea de comandos psql
+
+
+Python (Virtual Environment)
+----------------------------
+
+python -m venv venv				Crear un nuevo entorno virtual llamado venv
+source venv/bin/activate			Activar el entorno virtual en Linux
+deactivate					Desactivar el entorno virtual actual
+pip install package_name			Instalar un paquete en el entorno virtual
+pip install -r requirements.txt			Instalar paquetes desde un archivo requirements.txt
+pip uninstall package_name			Desinstalar un paquete del entorno virtual
+pip freeze					Listar todos los paquetes instalados en el entorno virtual
+
+
+
+Django
+------
+
+django-admin startproject project_name		Crear un nuevo proyecto de Django
+python manage.py startapp app_name		Crear una nueva aplicación dentro del proyecto
+python manage.py runserver			Iniciar el servidor de desarrollo
+python manage.py makemigrations			Crear nuevas migraciones basadas en cambios en los modelos
+python manage.py migrate			Aplicar migraciones a la base de datos
+python manage.py createsuperuser		Crear un super-usuario para acceder al panel de administración
+python manage.py shell				Abrir una consola interactiva con acceso a los modelos de Django
+python manage.py dumpdata > data.json		Exportar datos de la base de datos a un archivo JSON
+python manage.py loaddata data.json		Cargar datos desde un archivo JSON a la base de datos
+python manage.py collectstatic			Recopilar archivos estáticos en una ubicación única
+python manage.py test				Ejecutar las pruebas definidas en el proyecto
+python manage.py changepassword username	Cambiar la contraseña de un usuario específico
+python manage.py startapp app_name		Crear una nueva aplicación dentro del proyecto
+python manage.py runserver 0.0.0.0:8000		Iniciar el servidor en todas las interfaces en el puerto 8000
+python manage.py showmigrations			Mostrar el estado de las migraciones
+python manage.py flush				Eliminar todos los datos de la base de datos
+
+
+npm (Node Package Manager)
+--------------------------
+
+sudo apt install nodejs				Instalar Node.js a través de los repositorios del sistema
+sudo apt install npm				Instalar npm (Node Package Manager)
+node -v						Verificar la versión de Node.js instalada
+npm -v						Verificar la versión de npm instalada
+npm init					Inicializar un nuevo proyecto Node.js
+npm install package_name			Instalar un paquete en el proyecto
+npm uninstall package_name			Desinstalar un paquete del proyecto
+npm update					Actualizar todos los paquetes a sus últimas versiones
+npm list					Listar los paquetes instalados en el proyecto
+
+
+Truffle
+-------
+
+npm install -g truffle				Instalar Truffle globalmente en el sistema
+truffle version					Verificar la versión de Truffle instalada
+truffle init					Crear un nuevo proyecto de Truffle
+truffle compile					Compilar contratos inteligentes
+truffle migrate					Desplegar contratos en la red especificada
+truffle migrate --reset				Desplegar contratos de nuevo, ignorando el estado anterior
+truffle test					Ejecutar pruebas definidas para los contratos
+truffle develop					Iniciar un entorno de desarrollo Truffle
+truffle console					Abrir una consola interactiva de Truffle
+truffle exec script.js				Ejecutar un script de JavaScript dentro del contexto de Truffle
+truffle config					Ver la configuración del proyecto Truffle
+truffle networks				Ver las redes disponibles en el archivo de configuración

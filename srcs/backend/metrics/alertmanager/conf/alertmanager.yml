@@ -1,0 +1,51 @@
+global:
+  resolve_timeout: 5m
+  # smtp_smarthost: 'smtp.gmail.com:587'                                                              # Servidor SMTP de Gmail
+  smtp_smarthost: 'smtp.office365.com:587'                                                            # Servidor SMTP de Hotmail/Outlook
+  smtp_from: 'k-pong@alerts.com'
+  smtp_auth_username: 'victorzurera82@hotmail.com'
+  smtp_auth_password: 'jimxqljfltpscbhm'                                                              # Usa una contraseña de aplicación si es Gmail
+  smtp_require_tls: true
+
+route:
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: "slack-notifications"  # Receiver por defecto
+
+  routes:
+    # Alerta de severidad "critical", envía a ambos: email y slack
+    - matchers:
+        - severity = critical
+      receiver: "email-notifications"
+      routes:
+        - receiver: "slack-notifications"
+
+    # Alerta de severidad "warning", envía a ambos: email y slack
+    - matchers:
+        - severity = warning
+      receiver: "email-notifications"
+      routes:
+        - receiver: "slack-notifications"
+
+    # Alerta de severidad "email", envía a ambos: email y slack
+    - matchers:
+        - severity = email
+      receiver: "email-notifications"
+      routes:
+        - receiver: "slack-notifications"
+
+receivers:
+  - name: "slack-notifications"
+    slack_configs:
+      - api_url: "https://hooks.slack.com/services/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"  # URL de Webhook
+        channel: "#k-pong"                                                                            # Tu usuario de Slack
+        send_resolved: true
+        text: "{{ .CommonAnnotations.description }}"
+
+  - name: "email-notifications"
+    email_configs:
+      - to: 'vzurera-@student.42malaga.com'                                                           # Cambia esto al correo donde quieres recibir las alertas
+        send_resolved: true
+
+# https://join.slack.com/t/k-pong/shared_invite/zt-2tng0cgnn-eMQhZaOdD1G77c3PvwAIGw
