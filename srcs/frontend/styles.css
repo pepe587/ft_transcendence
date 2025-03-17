@@ -34,7 +34,7 @@ p {
     backdrop-filter: blur(10px);
 }
 
-.login-bt {
+.login-btn {
     text-align: center;
     background-color: rgba(26, 193, 223, 0.1);
     border-radius: 20px;
@@ -52,4 +52,16 @@ p {
     line-height: 1.5;  /* Altura de la línea para mejorar la legibilidad */
     text-decoration: none;  /* Sin subrayado */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);  /* Sombra en el texto */
+}
+
+.login-btn:hover {
+    background-color: rgba(26, 193, 223, 0.3);
+    color: #fff;
+}
+
+#g-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none !important;
 }

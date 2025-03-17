@@ -1,13 +1,15 @@
-function buttonClicked() {
-    const outputDiv = document.getElementById('output'); // Obtén el contenedor donde imprimirás el mensaje
-    if (outputDiv) {
-        for (let i = 0; i < 5; i++) {
-            const newMessage = document.createElement('p'); // Crea un nuevo párrafo
-            newMessage.textContent = 'IJOfruTA'; // Establece el texto del párrafo
-            outputDiv.appendChild(newMessage); // Añade el párrafo al contenedor
-        }
+declare const axios: any;
+
+async function ButtonClicked() {
+    console.log('Button clicked');
+    try {
+        const response = await axios.get('/api/message');
+        console.log(response.data.message);
+        console.log('Response received');
+    } catch (error) {
+        console.error(error);
     }
 }
 
-const button = document.getElementById('botoncico');
-button?.addEventListener('click', buttonClicked);
+const googleLoginButton = document.getElementById('google-login') as HTMLButtonElement | null;
+googleLoginButton?.addEventListener('click', ButtonClicked);

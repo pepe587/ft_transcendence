@@ -11,12 +11,16 @@ all: up
 
 # Create containers
 up:
+	@rm -fr srcs/frontend/dist/page.js
+	@cd srcs/frontend && npm install && tsc && cd -
+	@cd srcs/backend/typescript && npm install && npm run build && npm start && cd -
 	@$(DOCKER_COMPOSE) $(DC) up -d || exit 1
 	@printf "\n"
 	@cat doc/enter.txt || exit 1
 
 # Removes containers
 down:
+	@rm -fr srcs/frontend/page.js
 	@$(DOCKER_COMPOSE) $(DC) down || exit 1
 	@printf "\n"
 
@@ -92,11 +96,9 @@ _remove:
 	@docker rmi srcs-prometheus > /dev/null 2>&1 || true
 	@docker rmi srcs-service1 > /dev/null 2>&1 || true
 
-nuke:
-	fcclean _remove
+nuke: fcclean _remove
 
-re:
-	nuke all
+re: nuke all
 
 .PHONY: all up down restart build rebuild clean vclean fclean fcclean _remove nuke
 

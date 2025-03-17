@@ -60,7 +60,7 @@ services:
       - pong-net                                      # Network connecting all containers
     restart: always                                   # Restart container in case of failure
 
-  # portainer (9000)
+  # Portainer (9000)
   portainer:
     container_name: portainer                         # Container name
     env_file: .env                                    # File with environment variables
@@ -78,7 +78,7 @@ services:
     environment:
       - UID=${UID}  # Pasar UID como variable de entorno
 
-  # cAdvisor (8080)
+  # Cadvisor (8080)
   cadvisor:
     container_name: cadvisor                          # Container name
     image: gcr.io/cadvisor/cadvisor:latest

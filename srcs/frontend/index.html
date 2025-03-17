@@ -6,6 +6,7 @@
 	<title>ft_trascendence 1.0</title>
 	<link rel="stylesheet" href="styles.css">
 	<script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -18,15 +19,11 @@
      	data-callback="handleCredentialResponse"
      	data-auto_prompt="false">
 		</div>
-		<button class="login-bt" id="google-login">
-			<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="30">
+		<button class="login-btn" id="google-login">
+			<img src="images/g-logo.png" alt="Google Logo" id="g-logo" width="30">
 			LOGIN
 		</button>
-		<script src="page.js"></script>
-	
-	</div>
-	<div id="000000">
-	</div>
+		<script type="module" src="dist/page.js"></script>
 </body>
 
 </html>
