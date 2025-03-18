@@ -12,12 +12,11 @@ function ButtonClicked() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Button clicked');
         try {
-            const response = yield axios.get('/api/message');
-            console.log(response.data.message);
-            console.log('Response received');
+            // Redirect the user to the Google OAuth login page
+            window.location.href = 'http://localhost:4000/login/google';
         }
         catch (error) {
-            console.error(error);
+            console.error('Redirect error:', error);
         }
     });
 }

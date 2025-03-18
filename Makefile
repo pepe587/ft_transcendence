@@ -9,15 +9,22 @@ DOCKER_COMPOSE = UID=$(shell id -u) docker compose -f
 
 all: up
 
+dir:
+	mkdir ~/.npm-global || true
+	npm config set prefix '~/.npm-global'
+	echo "export PATH=~/.npm-global/bin:$PATH" >> ~/.zshrc
+	source ~/.zshrc
+	npm install -g typescript
+
+
 # Create containers
 up:
 	@rm -fr srcs/frontend/dist/page.js
-	@cd srcs/frontend && npm install && tsc && cd -
-	@cd srcs/backend/typescript && npm install && npm run build && npm start && cd -
+	@cd srcs/frontend && npm install && npm install -g typescript && tsc && cd -
 	@$(DOCKER_COMPOSE) $(DC) up -d || exit 1
 	@printf "\n"
 	@cat doc/enter.txt || exit 1
-
+	@cd srcs/backend/typescript && npm install && npm run build && npm start && cd -
 # Removes containers
 down:
 	@rm -fr srcs/frontend/page.js

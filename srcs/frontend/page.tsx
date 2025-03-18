@@ -3,11 +3,10 @@ declare const axios: any;
 async function ButtonClicked() {
     console.log('Button clicked');
     try {
-        const response = await axios.get('/api/message');
-        console.log(response.data.message);
-        console.log('Response received');
+        // Redirect the user to the Google OAuth login page
+        window.location.href = 'http://localhost:4000/login/google';
     } catch (error) {
-        console.error(error);
+        console.error('Redirect error:', error);
     }
 }
 
