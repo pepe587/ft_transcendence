@@ -2,30 +2,41 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<title>ft_trascendence 1.0</title>
-	<link rel="stylesheet" href="styles.css">
-	<script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <title>ft_trascendence 1.0</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
-	<div class="container">
-		<h1>Bienvenido a ft_trascendence 1.0</h1>
-		<p>Este es el servidor secundario</p>
-		<p class="small-text">Esta página es un HTML estático</p>
-		<div id="g_id_onload"
-     	data-client_id="TU_CLIENT_ID"
-     	data-callback="handleCredentialResponse"
-     	data-auto_prompt="false">
-		</div>
-		<button class="login-btn" id="google-login">
-			<img src="images/g-logo.png" alt="Google Logo" id="g-logo" width="30">
-			LOGIN
-		</button>
-		<script type="module" src="dist/page.js"></script>
+    <div class="login">
+        <h1>Bienvenido a ft_trascendence 1.0</h1>
+        <div class="login-form">
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button class="login-btn" id="normal-login">Iniciar Sesión</button>
+        </div>
+        <hr class="divider">
+        <button class="google-login-btn" id="google-login">
+            <img src="images/g-logo.png" alt="Google Logo" id="g-logo" width="30">
+            LOGIN CON GOOGLE
+        </button>
+        <script type="module" src="dist/page.js"></script>
+    </div>
+    <div class="mainpage">
+        <h1>ft_trascendence 1.0</h1>
+        <div class="mainpage-form">
+            <button class="mainpage-btn" id="logout">Cerrar Sesión</button>
+        </div>
+        <hr class="divider">
+        <button class="mainpage-btn" id="profile">Perfil</button>
+        <button class="mainpage-btn" id="settings">Configuración</button>
+        <button class="mainpage-btn" id="friends">Amigos</button>
+        <button class="mainpage-btn" id="chat">Chat</button>
+        <button class="mainpage-btn" id="game">Jugar</button>
+        <button class="mainpage-btn" id="admin">Administrar</button>
+        <script type="module" src="dist/page.js"></script>
+    </div>
 </body>
 
 </html>
-
-<!-- Esta es la página 'index.html' de la raíz del servidor secundario -->

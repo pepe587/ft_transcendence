@@ -14,35 +14,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
 const cors_1 = __importDefault(require("@fastify/cors"));
-const oauth2_1 = __importDefault(require("@fastify/oauth2"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+dotenv_1.default.config({ path: '../../.env' });
 const app = (0, fastify_1.default)({ logger: true });
 app.googleOAuth2 = null;
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
+const googleClientId = process.env.GCLIENT_ID;
+const googleClientSecret = process.env.CLIENT_SECRET;
+const googleRedirectUri = process.env.RDIR_URI;
+let loggedIn = false;
+let access_token;
 app.register(cors_1.default);
-if (!app.hasDecorator('googleOAuth2')) {
-    app.register(oauth2_1.default, {
-        name: 'googleOAuth2',
-        scope: ['profile', 'email'],
-        credentials: {
-            client: {
-                id: process.env.CLIENT_ID,
-                secret: process.env.CLIENT_SECRET
-            },
-            auth: oauth2_1.default.GOOGLE_CONFIGURATION
-        },
-        startRedirectPath: '/login/google',
-        callbackUri: 'http://localhost:4000/login/google/callback'
-    });
-}
-app.get('/login/google/callback', (req, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = yield app.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req);
-    reply.send({ token });
-}));
 app.get('/api/oauth', (req, reply) => {
     console.log('OAuth request received');
-    reply.send({ message: 'OAuth request received' });
+    reply.redirect(`https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=profile email`);
+});
+app.get('/api/callback', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("\n\n\n\n\n\n\n\nHandling callback ...\n\n\n\n\n\n\n");
+    let code = req.query.code;
+    try {
+        const response = yield app.inject({
+            method: 'POST',
+            url: 'https://oauth2.googleapis.com/token',
+            payload: {
+                client_id: googleClientId,
+                client_secret: googleClientSecret,
+                redirect_uri: googleRedirectUri,
+                code: code,
+                grant_type: 'authorization_code'
+            }
+        });
+        const responseBody = JSON.parse(response.body);
+        access_token = responseBody.access_token;
+        console.log(`Access token received`);
+        // Redirigir a la página principal
+        res.redirect('https://localhost:8443');
+        loggedIn = true;
+    }
+    catch (error) {
+        console.error('Error during callback handling:', error);
+        res.send('An error occurred');
+    }
+}));
+app.get('/api/loggedin', (req, res) => {
+    res.send({ loggedIn });
 });
 app.listen({ port }, (err, address) => {
     if (err) {
