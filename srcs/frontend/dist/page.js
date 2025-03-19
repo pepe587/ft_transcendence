@@ -8,21 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-function isUserLoggedIn() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('http://localhost:4000/api/loggedin');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const data = yield response.json();
-            return data.loggedIn;
-        }
-        catch (error) {
-            console.error('Fetch error:', error);
-        }
-    });
-}
 function googleSignIn() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Button clicked');
@@ -33,17 +18,38 @@ function googleSignIn() {
         catch (error) {
             console.error('Redirect error:', error);
         }
-        if (yield isUserLoggedIn()) {
-            const mainPage = document.getElementsByClassName('mainpage')[0];
-            const loginPage = document.getElementsByClassName('login')[0];
-            if (mainPage) {
-                mainPage.style.display = 'flex';
-            }
-            if (loginPage) {
-                loginPage.style.display = 'none';
-            }
-        }
     });
 }
 const googleLoginButton = document.getElementById('google-login');
 googleLoginButton === null || googleLoginButton === void 0 ? void 0 : googleLoginButton.addEventListener('click', googleSignIn);
+const socket = new WebSocket('ws://localhost:4000/ws');
+socket.onmessage = (event) => {
+    console.log('Mensaje recibido:', event.data);
+    const isLoggedIn = JSON.parse(event.data);
+    if (isLoggedIn) {
+        const mainPage = document.getElementsByClassName('mainpage')[0];
+        const loginPage = document.getElementsByClassName('login')[0];
+        if (mainPage) {
+            mainPage.style.display = 'flex';
+        }
+        if (loginPage) {
+            loginPage.style.display = 'none';
+        }
+    }
+    else if (!isLoggedIn) {
+        const mainPage = document.getElementsByClassName('mainpage')[0];
+        const loginPage = document.getElementsByClassName('login')[0];
+        if (mainPage) {
+            mainPage.style.display = 'none';
+        }
+        if (loginPage) {
+            loginPage.style.display = 'flex';
+        }
+    }
+};
+socket.onopen = () => {
+    console.log('Conectado al WebSocket');
+};
+socket.onerror = (error) => {
+    console.error('Error en WebSocket:', error);
+};

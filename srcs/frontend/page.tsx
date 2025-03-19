@@ -1,18 +1,5 @@
 declare const axios: any;
 
-async function isUserLoggedIn() {
-    try {
-        const response = await fetch('http://localhost:4000/api/loggedin');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data.loggedIn;
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-}
-
 async function googleSignIn() {
     console.log('Button clicked');
     try {
@@ -21,7 +8,16 @@ async function googleSignIn() {
     } catch (error) {
         console.error('Redirect error:', error);
     }
-    if (await isUserLoggedIn()) {
+}
+
+const googleLoginButton = document.getElementById('google-login') as HTMLButtonElement | null;
+googleLoginButton?.addEventListener('click', googleSignIn);
+const socket = new WebSocket('ws://localhost:4000/ws');
+
+socket.onmessage = (event) => {
+    console.log('Mensaje recibido:', event.data);
+    const isLoggedIn = JSON.parse(event.data);
+    if (isLoggedIn) {
         const mainPage = document.getElementsByClassName('mainpage')[0] as HTMLDivElement | null;
         const loginPage = document.getElementsByClassName('login')[0] as HTMLDivElement | null;
 
@@ -32,7 +28,23 @@ async function googleSignIn() {
             loginPage.style.display = 'none';
         }
     }
-}
+    else if (!isLoggedIn) {
+        const mainPage = document.getElementsByClassName('mainpage')[0] as HTMLDivElement | null;
+        const loginPage = document.getElementsByClassName('login')[0] as HTMLDivElement | null;
 
-const googleLoginButton = document.getElementById('google-login') as HTMLButtonElement | null;
-googleLoginButton?.addEventListener('click', googleSignIn);
+        if (mainPage) {
+            mainPage.style.display = 'none';
+        }
+        if (loginPage) {
+            loginPage.style.display = 'flex';
+        }
+    }
+};
+
+socket.onopen = () => {
+    console.log('Conectado al WebSocket');
+};
+
+socket.onerror = (error) => {
+    console.error('Error en WebSocket:', error);
+};

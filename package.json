@@ -15,11 +15,13 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
+    "@types/ws": "^8.18.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",
     "@fastify/oauth2": "^8.1.2",
+    "@fastify/websocket": "^11.0.2",
     "axios": "^1.8.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

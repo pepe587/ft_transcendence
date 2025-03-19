@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
 const cors_1 = __importDefault(require("@fastify/cors"));
+const websocket_1 = __importDefault(require("@fastify/websocket"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: '../../.env' });
 const app = (0, fastify_1.default)({ logger: true });
@@ -24,7 +25,19 @@ const googleClientSecret = process.env.CLIENT_SECRET;
 const googleRedirectUri = process.env.RDIR_URI;
 let loggedIn = false;
 let access_token;
-app.register(cors_1.default);
+app.register(cors_1.default, {
+    origin: '*', // Permitir todas las conexiones (ajusta si es necesario)
+});
+app.register(websocket_1.default);
+let clients = [];
+app.get('/ws', { websocket: true }, (connection, req) => {
+    console.log('Cliente conectado');
+    clients.push(connection);
+    connection.on('close', () => {
+        console.log('Cliente desconectado');
+        clients = clients.filter(c => c !== connection);
+    });
+});
 app.get('/api/oauth', (req, reply) => {
     console.log('OAuth request received');
     reply.redirect(`https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=profile email`);
@@ -50,15 +63,13 @@ app.get('/api/callback', (req, res) => __awaiter(void 0, void 0, void 0, functio
         // Redirigir a la página principal
         res.redirect('https://localhost:8443');
         loggedIn = true;
+        clients.forEach(client => client.socket.send(JSON.stringify(true)));
     }
     catch (error) {
         console.error('Error during callback handling:', error);
         res.send('An error occurred');
     }
 }));
-app.get('/api/loggedin', (req, res) => {
-    res.send({ loggedIn });
-});
 app.listen({ port }, (err, address) => {
     if (err) {
         console.error(err);

@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
+import fastifyWebSocket from '@fastify/websocket';
 import fastifyOauth2 from '@fastify/oauth2';
 import dotenv from 'dotenv';
 import { FastifyInstance } from 'fastify';
@@ -18,7 +19,23 @@ const googleRedirectUri = process.env.RDIR_URI;
 let loggedIn = false;
 let access_token;
 
-app.register(fastifyCors);
+app.register(fastifyCors, {
+    origin: '*', // Permitir todas las conexiones (ajusta si es necesario)
+});
+app.register(fastifyWebSocket);
+
+let clients: any[] = [];
+
+app.get('/ws', { websocket: true }, (connection, req) => {
+    console.log('Cliente conectado');
+    clients.push(connection);
+
+    connection.on('close', () => {
+        console.log('Cliente desconectado');
+        clients = clients.filter(c => c !== connection);
+    });
+});
+
 
 app.get('/api/oauth', (req, reply) => {
     console.log('OAuth request received');
@@ -46,18 +63,13 @@ app.get('/api/callback', async (req, res) => {
         // Redirigir a la página principal
         res.redirect('https://localhost:8443');
         loggedIn = true;
-    } catch (error) {
+        clients.forEach(client => client.socket.send(JSON.stringify(true)));
+    }
+    catch (error) {
         console.error('Error during callback handling:', error);
         res.send('An error occurred');
     }
 });
-
-app.get('/api/loggedin', (req, res) => {
-    res.send({ loggedIn });
-});
-
-
-
 
 app.listen({ port }, (err, address) => {
     if (err) {
