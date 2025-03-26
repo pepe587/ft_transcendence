@@ -1,100 +1,31 @@
-
 services:
-
 
 # ----------------- WEB SERVER ----------------- #
 
 
   # Nginx (80, 443 & 9113)
   nginx:
-    container_name: nginx                             # Container name
+    container_name: nginx
     build:
-      context: ./backend/nginx                        # Location of the Dockerfile
-    volumes:
-      - frontend_data:/usr/share/nginx/html           # Bind mount (instant changes)
+      context: ./frontend/nginx
     ports:
-      - "8082:80"                                       # Port for HTTP
-      - "8443:443"                                     # Port for HTTPS
+      - "443:443"
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
+      - pong-net
+    restart: unless-stopped
 
-# ------------------- METRICS ------------------ #
-
-
-  # Prometheus (9090)
-  prometheus:
-    container_name: prometheus                        # Container name
-    build:
-      context: ./backend/metrics/prometheus           # Location of the Dockerfile
+  # Web (3000)
+  web:
+    container_name: web
+    build: 
+      context: ./frontend/web
+      dockerfile: Dockerfile.dev
     volumes:
-      - prometheus_data:/prometheus                   # Prometheus data volume
+      - ./frontend/web/src:/app/src
+      - ./frontend/web/public:/app/public
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
-
-  # Grafana (3000)
-  grafana:
-    container_name: grafana                           # Container name
-    build:
-      context: ./backend/metrics/grafana              # Location of the Dockerfile
-    env_file: .env                                    # File with environment variables
-    environment:
-      - GF_SERVER_ROOT_URL=https://localhost/grafana/ # Base path for Grafana
-      - GF_SECURITY_ADMIN_USER=grafana
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASS}
-    volumes:
-      - grafana_data:/var/lib/grafana
-    networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
-
-  # AlertManager (9093)
-  alertmanager:
-    container_name: alertmanager                      # Container name
-    build:
-      context: ./backend/metrics/alertmanager         # Location of the Dockerfile
-    volumes:
-      - alertmanager_data:/alertmanager
-    networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
-
-  # Portainer (9000)
-  portainer:
-    container_name: portainer                         # Container name
-    env_file: .env                                    # File with environment variables
-    build:
-      context: ./backend/metrics/portainer            # Location of the Dockerfile
-      args:
-        PORTAINER_PASSWORD: ${ADMIN_PASS}
-    volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock     # Allows the container to access the Docker daemon
-      - /run/user/${UID}/docker.sock:/var/run/docker.sock  # change number 104347 to user id
-      - portainer_data:/data
-    networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
-    environment:
-      - UID=${UID}  # Pasar UID como variable de entorno
-
-  # Cadvisor (8080)
-  cadvisor:
-    container_name: cadvisor                          # Container name
-    image: gcr.io/cadvisor/cadvisor:latest
-    volumes:
-      - /:/rootfs:ro                                  # Acceso al sistema de archivos raíz
-      - /sys:/sys:ro                                  # Acceso al sistema de archivos sys
-      - /var/run:/var/run:ro                          # Acceso a la información de contenedores
-      - /var/lib/docker/:/var/lib/docker:ro           # Acceso a los datos de Docker
-      - /run/user/${UID}/docker.sock:/var/run/docker.sock
-    ports:
-      - "8090:8080"
-    networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
-    environment:
-      - UID=${UID}  # Pasar UID como variable de entorno
+      - pong-net
+    restart: unless-stopped
 
 
 # ------------------- LOGGING ------------------ #
@@ -102,94 +33,185 @@ services:
 
   # ElasticSearch (9200 & 9114)
   elasticsearch:
-    container_name: elasticsearch                     # Container name
+    container_name: elasticsearch
     build:
-      context: ./backend/logging/elasticsearch        # Location of the Dockerfile
-    env_file: .env                                    # File with environment variables
-    environment:
-      - discovery.type=single-node                    # Set to single-node mode (multi-node clustering is unnecessary for this project)
-      - xpack.security.enabled=true                   # Enable security features (e.g., authentication)
-      - logger.level=ERROR                            # Set logging level to show only errors (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
-      - ES_USERNAME=elastic
-      - ES_PASSWORD=${ADMIN_PASS}
-      - ELASTIC_PASSWORD=${ADMIN_PASS}
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m                # Set the minimum and maximum heap size to 512MB
+      context: ./backend/logging/elasticsearch
     volumes:
-      - elastic_data:/usr/share/elasticsearch/data    # Bind mount (temporary)
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - logger.level=ERROR
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl -f -u $$ELASTICSEARCH_USERNAME:$$ELASTICSEARCH_PASSWORD http://localhost:9200/_cluster/health?wait_for_status=yellow\\&timeout=30s"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
+      - pong-net
+    restart: unless-stopped
 
   # LogStash (5044)
   logstash:
-    container_name: logstash                          # Container name
+    container_name: logstash
     build:
-      context: ./backend/logging/logstash             # Location of the Dockerfile
-    env_file: .env                                    # File with environment variables
+      context: ./backend/logging/logstash
     environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ADMIN_PASS}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
+      - pong-net
+    restart: unless-stopped
 
   # Kibana (5601)
   kibana:
-    container_name: kibana                            # Container name
-    image: docker.elastic.co/kibana/kibana:7.17.4
-    env_file: .env                                    # File with environment variables
+    container_name: kibana
+    build:
+      context: ./backend/logging/kibana
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200 # Elasticsearch URL
-      - SERVER_BASEPATH=/kibana                       # Base path for Kibana
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ADMIN_PASS}
+      - SERVER_BASEPATH=/kibana
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - SERVER_PUBLICBASEURL=${HOST_NAME-https://localhost}/kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
+      - pong-net
+    restart: unless-stopped
 
 
-# ------------------- REDIS ------------------- #
+# ------------------- METRICS ------------------ #
+
+
+  # Prometheus (9090)
+  prometheus:
+    container_name: prometheus
+    build:
+      context: ./backend/metrics/prometheus
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      - pong-net
+    restart: unless-stopped
+
+  # Grafana (3000)
+  grafana:
+    container_name: grafana
+    build:
+      context: ./backend/metrics/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SERVER_ROOT_URL=${HOST_NAME-https://localhost}/grafana
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME-${ADMIN_USERNAME}}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD-${ADMIN_PASSWORD}}
+    networks:
+      - pong-net
+    restart: unless-stopped
+
+  # AlertManager (9093)
+  alertmanager:
+    container_name: alertmanager
+    build:
+      context: ./backend/metrics/alertmanager
+    volumes:
+      - alertmanager_data:/alertmanager
+    networks:
+      - pong-net
+    restart: unless-stopped
+
+
+# --------------- REDIS & GATEWAY --------------- #
+
 
   # Redis (6379)
+   
   redis:
-    container_name: redis                             # Container name
-    image: redis:latest
+    container_name: redis
+    image: redis:7.4.2
     volumes:
       - redis_data:/data
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD-${ADMIN_PASSWORD}}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD-${ADMIN_PASSWORD}}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     networks:
-      - pong-net                                      # Network connecting all containers
-    restart: always                                   # Restart container in case of failure
+      - pong-net
+    restart: unless-stopped
+
+
+  # Gateway (3000)
+  # gateway:
+  #   container_name: gateway
+  #   build:
+  #     context: ./backend/gateway
+  #     dockerfile: Dockerfile.dev
+  #   volumes:
+  #     - ./backend/gateway/src:/app/src
+  #   environment:
+  #     - SERVICE_URL=gateway:3000
+  #     - LOGSTASH_URL=logstash:5044
+  #     - REDIS_URL=redis:6379
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
+  #     - EXAMPLE_SERVICE_URL=http://example:3000
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - pong-net
 
 
 # --------------- MICRO-SERVICES --------------- #
 
 
+  # Example (3000)
+  # example:
+  #   container_name: example
+  #   build:
+  #     context: ./backend/services/example
+  #     dockerfile: Dockerfile.dev
+  #   volumes:
+  #     - ./backend/services/example/src:/app/src
+  #     - ms_example_data:/app/data
+  #   environment:
+  #     - SERVICE_URL=example:3000
+  #     - REDIS_URL=redis:6379
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
+  #     - GATEWAY_URL=http://gateway:3000
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - pong-net
+  #   restart: unless-stopped
 
 
 # ------------------ VOLUMES ------------------- #
 
-
 volumes:
-  prometheus_data:                                    # Prometheus data volume
-  grafana_data:                                       # Grafana data volume
-  alertmanager_data:                                  # AlertManager data volume
-  portainer_data:                                     # Portainer data volume
-  elastic_data:                                       # ElasticSearch data volume
-  redis_data:                                         # Redis data volume
-    driver: local                                     # Use the local driver for this volume
-    driver_opts:
-      type: none                                      # Use a bind mount instead of creating a separate filesystem
-      device: ./backend/logging/data                  # Path in the host filesystem for the bind mount
-      o: bind                                         # Activate the bind mount
-  frontend_data:
-    driver: local                                     # Use the local driver for this volume
-    driver_opts:
-      type: none                                      # Use a bind mount instead of creating a separate filesystem
-      device: ./frontend                              # Path in the host filesystem for the bind mount
-      o: bind                                         # Activate the bind mount
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
+  redis_data:
+  # ms_example_data:
 
 # ------------------ NETWORK ------------------- #
 
 networks:
   pong-net:
-    name: pong-net                                    # Network connecting all containers
+    name: pong-net

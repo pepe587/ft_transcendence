@@ -8,20 +8,24 @@ rule_files:
 
 scrape_configs:
   - job_name: 'nginx'
+    scrape_interval: 30s
     static_configs:
       - targets: ['nginx:9113']
-  - job_name: 'postgre'
-    static_configs:
-      - targets: ['postgre:9187']
+
   - job_name: 'elasticsearch'
+    scrape_interval: 30s
     static_configs:
       - targets: ['elasticsearch:9114']
-  - job_name: 'service1'
-    static_configs:
-      - targets: ['service1:8000']
-  - job_name: "cadvisor"
-    static_configs:
-      - targets: ["cadvisor:8080"]
+
+  # - job_name: 'gateway'
+  #   scrape_interval: 30s
+  #   static_configs:
+  #     - targets: ['gateway:3000']
+
+  # - job_name: 'example'
+  #   scrape_interval: 30s
+  #   static_configs:
+  #     - targets: ['example:3000']
 
 alerting:
   alertmanagers:

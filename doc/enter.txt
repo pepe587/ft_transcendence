@@ -1,6 +1,0 @@
-MAIN:
-        https://localhost:8443/
-
-KIBANA
-        https://localhost:8443/kibana
-

@@ -1,0 +1,40 @@
+Docker
+------
+
+docker --version								Verificar la versión de Docker instalada
+docker ps										Listar contenedores en ejecución
+docker ps -a									Listar todos los contenedores (incluidos detenidos)
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]	Ejecutar un nuevo contenedor
+docker stop CONTAINER_ID						Detener un contenedor en ejecución
+docker rm CONTAINER_ID							Eliminar un contenedor
+docker images									Listar imágenes disponibles en el sistema
+docker rmi IMAGE_ID								Eliminar una imagen
+docker logs CONTAINER_ID						Ver los registros de un contenedor
+docker exec -it CONTAINER_ID COMMAND			Ejecutar un comando en un contenedor en ejecución
+docker stats									Ver el estado de los recursos (uso de CPU, memoria, etc.)
+docker-compose --version						Verificar la versión de Docker Compose instalada
+docker-compose up								Iniciar servicios definidos en el archivo docker-compose
+docker-compose up -d							Iniciar servicios en segundo plano (detached)
+docker-compose down								Detener y eliminar servicios definidos en docker-compose
+docker-compose restart							Reiniciar servicios definidos en docker-compose
+docker-compose logs								Ver los registros de los servicios definidos en docker-compose
+docker-compose build							Construir o reconstruir servicios definidos en docker-compose
+docker-compose ps								Listar servicios en ejecución definidos en docker-compose
+docker-compose exec SERVICE COMMAND				Ejecutar un comando en un servicio definido en docker-compose
+docker-compose top								Ver el estado de los recursos de los servicios
+docker-compose down --rmi all					Detener y eliminar servicios junto con las imágenes
+docker-compose config							
+
+npm (Node Package Manager)
+--------------------------
+
+sudo apt install nodejs							Instalar Node.js a través de los repositorios del sistema
+sudo apt install npm							Instalar npm (Node Package Manager)
+node -v											Verificar la versión de Node.js instalada
+npm -v											Verificar la versión de npm instalada
+npm init										Inicializar un nuevo proyecto Node.js
+npm install										
+npm install package_name						Instalar un paquete en el proyecto
+npm uninstall package_name						Desinstalar un paquete del proyecto
+npm update										Actualizar todos los paquetes a sus últimas versiones
+npm list										Listar los paquetes instalados en el proyecto

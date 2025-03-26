@@ -4,108 +4,112 @@ GR = \033[0;32m
 NC = \033[0m
 CU = \033[1A
 CL = \r%50s\r
-DC = srcs/docker-compose.yml
-DOCKER_COMPOSE = UID=$(shell id -u) docker compose -f
+DC = COMPOSE_BAKE=true docker compose -f srcs/docker-compose.yml
+
+
+# ============================== CONTAINER RULES ==============================
+
 
 all: up
 
-dir:
-	mkdir ~/.npm-global || true
-	npm config set prefix '~/.npm-global'
-	echo "export PATH=~/.npm-global/bin:$PATH" >> ~/.zshrc
-	source ~/.zshrc
-	npm install -g typescript
-
-
 # Create containers
 up:
-	@rm -fr srcs/frontend/dist/page.js
-	@cd srcs/frontend && npm install && npm install -g typescript && tsc && cd -
-	@$(DOCKER_COMPOSE) $(DC) up -d || exit 1
+	@$(DC) up -d || exit 1
 	@printf "\n"
-	@cat doc/enter.txt || exit 1
-	@cd srcs/backend/typescript && npm install && npm run build && npm start && cd -
+
 # Removes containers
 down:
-	@rm -fr srcs/frontend/page.js
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
+	@$(DC) down || exit 1
 	@printf "\n"
 
 # Restarts containers
 restart:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
-	@$(DOCKER_COMPOSE) $(DC) up -d || exit 1
+	@$(DC) down || exit 1
+	@$(DC) up -d || exit 1
 	@printf "\n"
 
 # Builds containers
 build:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
-	@$(DOCKER_COMPOSE) $(DC) build || exit 1
-	@printf "\n ✔ Containers\t\t\t$(GR)Built$(NC)\n\n"
+	@$(DC) down || exit 1
+	@$(DC) build || exit 1
+	@printf "\n ✔ Containers\t  $(GR)Built$(NC)\n\n"
 
 # Rebuilds containers
 rebuild:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
-	@$(DOCKER_COMPOSE) $(DC) build --no-cache || exit 1
-	@printf "\n ✔ Containers\t\t\t$(GR)Rebuilt$(NC)\n\n"
+	@$(DC) down || exit 1
+	@$(DC) build --no-cache || exit 1
+	@printf "\n ✔ Containers\t\t$(GR)Rebuilt$(NC)\n\n"
+
+# Show docker-compose.yml with variables expanded
+config:
+	@d$(DC) config
+
+
+# ============================== CLEAN RULES ==============================
+
 
 # Removes images
-clean:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
+iclean:
+	@$(DC) down || exit 1
 	@printf "\nplease wait...\n"
-	@$(MAKE) -s _remove
-	@printf "$(CU)$(CL) ✔ Images\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Network\t\t\t$(GR)Removed$(NC)\n\n"
+	@$(MAKE) -s _remove_images
+	@printf "$(CU)$(CL) ✔ Images\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Network\t\t$(GR)Removed$(NC)\n\n"
 
 # Removes volumes
 vclean:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
+	@$(DC) down || exit 1
 	@printf "\nplease wait...\n"
-	@docker volume rm srcs_db-data > /dev/null 2>&1 || true
-	@docker volume rm srcs_db_logs > /dev/null 2>&1 || true
-	@printf "$(CU)$(CL) ✔ Volumes\t\t\t$(GR)Removed$(NC)\n\n"
+	@$(MAKE) -s _remove_volumes
+	@printf "$(CU)$(CL) ✔ Volumes\t\t$(GR)Removed$(NC)\n\n"
 
 # Removes images, volumes and network
-fclean:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
+clean:
+	@$(DC) down || exit 1
 	@printf "\nplease wait...\n"
-	@$(MAKE) -s _remove
-	@docker volume rm srcs_db-data > /dev/null 2>&1 || true
-	@docker volume rm srcs_db_logs > /dev/null 2>&1 || true
+	@$(MAKE) -s _remove_images
+	@$(MAKE) -s _remove_volumes
 	@docker network rm pong-net > /dev/null 2>&1 || true
-	@printf "$(CU)$(CL) ✔ Images\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Volumes\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Network\t\t\t$(GR)Removed$(NC)\n\n"
+	@printf "$(CU)$(CL) ✔ Images\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Volumes\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Network\t\t$(GR)Removed$(NC)\n\n"
 
 # Removes images, volumes, network and cache
-fcclean:
-	@$(DOCKER_COMPOSE) $(DC) down || exit 1
+fclean:
+	@$(DC) down || exit 1
 	@printf "\nplease wait...\n"
-	@$(MAKE) -s _remove
-	@docker volume rm srcs_db-data > /dev/null 2>&1 || true
-	@docker volume rm srcs_db_logs > /dev/null 2>&1 || true
+	@$(MAKE) -s _remove_images
+	@$(MAKE) -s _remove_volumes
 	@docker network rm pong-net > /dev/null 2>&1 || true
 	@docker builder prune -f > /dev/null 2>&1 || true
-	@printf "$(CU)$(CL) ✔ Images\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Volumes\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Network\t\t\t$(GR)Removed$(NC)\n"
-	@printf " ✔ Cache\t\t\t$(GR)Removed$(NC)\n\n"
+	@printf "$(CU)$(CL) ✔ Images\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Volumes\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Network\t\t$(GR)Removed$(NC)\n"
+	@printf " ✔ Cache\t\t$(GR)Removed$(NC)\n\n"
+
+
+# ============================== PRIVATE RULES ==============================
+
+
+# Remove volumes (private rule)
+_remove_volumes:
+	@docker volume rm srcs_elasticsearch_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_prometheus_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_grafana_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_alertmanager_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_redis_data > /dev/null 2>&1 || true
 
 # Remove images (private rule)
-_remove:
+_remove_images:
 	@docker rmi srcs-nginx > /dev/null 2>&1 || true
-	@docker rmi srcs-postgre > /dev/null 2>&1 || true
+	@docker rmi srcs-web > /dev/null 2>&1 || true
 	@docker rmi srcs-elasticsearch > /dev/null 2>&1 || true
 	@docker rmi srcs-logstash > /dev/null 2>&1 || true
 	@docker rmi srcs-kibana > /dev/null 2>&1 || true
-	@docker rmi srcs-alertmanager > /dev/null 2>&1 || true
-	@docker rmi srcs-grafana > /dev/null 2>&1 || true
 	@docker rmi srcs-prometheus > /dev/null 2>&1 || true
-	@docker rmi srcs-service1 > /dev/null 2>&1 || true
+	@docker rmi srcs-grafana > /dev/null 2>&1 || true
+	@docker rmi srcs-alertmanager > /dev/null 2>&1 || true
+	@docker rmi redis:7.4.2 > /dev/null 2>&1 || true
 
-nuke: fcclean _remove
-
-re: nuke all
-
-.PHONY: all up down restart build rebuild clean vclean fclean fcclean _remove nuke
+.PHONY: all up down restart build rebuild iclean vclean clean fclean _remove_images _remove_volumes
 

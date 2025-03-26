@@ -1,0 +1,12 @@
+{
+	"name": "gateway",
+	"version": "1.0.0",
+	"description": "API Gateway",
+	"author": "Tommy Nabo",
+	"main": "src/app.js",
+	"dependencies": {
+		"fastify": "^4.29.0",
+		"fastify-plugin": "^4.5.1",
+		"otras": "dependencias"
+	}
+}
