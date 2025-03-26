@@ -177,6 +177,25 @@ services:
 
 # --------------- MICRO-SERVICES --------------- #
 
+  node:
+    container_name: node
+    build:
+      context: ./backend/services/node
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/services/node/src:/app/src
+      - node_data:/app/data
+    environment:
+      - SERVICE_URL=example:3000
+      - REDIS_URL=redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
+      - GATEWAY_URL=http://gateway:3000
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pong-net
+    restart: unless-stopped
 
   # Example (3000)
   # example:
@@ -208,6 +227,7 @@ volumes:
   grafana_data:
   alertmanager_data:
   redis_data:
+  node_data: 
   # ms_example_data:
 
 # ------------------ NETWORK ------------------- #

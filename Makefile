@@ -87,6 +87,10 @@ fclean:
 	@printf " ✔ Network\t\t$(GR)Removed$(NC)\n"
 	@printf " ✔ Cache\t\t$(GR)Removed$(NC)\n\n"
 
+re:
+	make fclean
+	make up
+
 
 # ============================== PRIVATE RULES ==============================
 
