@@ -22,10 +22,11 @@
 
 ## Web (Frontend)
 - Creado contenedor para el frontend con estructura básica de directorios
-- Incluida plantilla de página 'Home' para iniciar rápidamente el desarrollo
+- Incluida plantilla de página Home
+- Hot-reload habilitado (aplican los cambios al instante)
 
 ## Gateway
-- Establecida estructura de directorios para API Gateway
+- Creada estructura de directorios para API Gateway
 
 ## Template
 - Creada estructura de directorios para el template de microservicios
