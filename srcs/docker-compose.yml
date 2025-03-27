@@ -177,22 +177,29 @@ services:
 
 # --------------- MICRO-SERVICES --------------- #
 
-  node:
-    container_name: node
+  # Node para OAuth (4001)
+  node-oauth:
+    container_name: node-oauth
     build:
-      context: ./backend/services/node
+      context: ./backend/services/node/node-oauth
       dockerfile: Dockerfile
     volumes:
-      - ./backend/services/node/src:/app/src
-      - node_data:/app/data
+      - ./backend/services/node/node-oauth:/src
+      - node-oauth_data:/app/data
     environment:
-      - SERVICE_URL=example:3000
-      - REDIS_URL=redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
-      - GATEWAY_URL=http://gateway:3000
+      - GCLIENT_ID=${GCLIENT_ID}
+      - PROJECT_ID=${PROJECT_ID}
+      - AUTH_URI=${AUTH_URI}
+      - TOKEN_URI=${TOKEN_URI}
+      - AUTH_PROVIDER_X509_CERT_URL=${AUTH_PROVIDER_X509_CERT_URL}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+    ports:
+    - "4001:4001"
     depends_on:
       redis:
         condition: service_healthy
+      #gateway:
+        #condition: service_healthy
     networks:
       - pong-net
     restart: unless-stopped
@@ -227,7 +234,7 @@ volumes:
   grafana_data:
   alertmanager_data:
   redis_data:
-  node_data: 
+  node-oauth_data:
   # ms_example_data:
 
 # ------------------ NETWORK ------------------- #

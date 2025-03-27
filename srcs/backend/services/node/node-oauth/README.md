@@ -1,6 +1,6 @@
 ## Descripcion
 
-Microservicio de NODE para el backend.
+Microservicio de Node para el backend de OAuth.
 
 ## Características
 

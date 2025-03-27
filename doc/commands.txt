@@ -38,3 +38,8 @@ npm install package_name						Instalar un paquete en el proyecto
 npm uninstall package_name						Desinstalar un paquete del proyecto
 npm update										Actualizar todos los paquetes a sus últimas versiones
 npm list										Listar los paquetes instalados en el proyecto
+
+Others
+------
+
+lsof -i:3000                                    Muestra que puertos en escucha que queramos verificar.
