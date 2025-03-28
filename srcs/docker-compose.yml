@@ -186,6 +186,7 @@ services:
     volumes:
       - ./backend/services/node/node-oauth:/src
       - node-oauth_data:/app/data
+      - sqlite-login_data:/data # Para SQLite
     environment:
       - GCLIENT_ID=${GCLIENT_ID}
       - PROJECT_ID=${PROJECT_ID}
@@ -200,6 +201,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      sqlite-login:
+        condition: service_started
       #gateway:
         #condition: service_healthy
     networks:
@@ -241,6 +244,8 @@ services:
       - ${LOGIN_PORT}=${LOGIN_PORT}
     ports:
       - "${LOGIN_PORT}:${LOGIN_PORT}"
+    networks:
+      - pong-net
 
   # Example (3000)
   # example:
