@@ -7,9 +7,22 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email && password) {
-      setError('');
+
+      try {
+        await fetch('https://localhost:4000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+      }
+      catch (error) {
+        setError('Usuario o contraseña incorrectos');
+        return;
+      }
       console.log('Iniciando sesión...');
       // Aquí iría la lógica de autenticación
     } else {

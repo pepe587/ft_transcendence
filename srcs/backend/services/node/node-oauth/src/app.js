@@ -29,7 +29,7 @@ const googleClientId = process.env.GCLIENT_ID;
 const googleClientSecret = process.env.CLIENT_SECRET;
 const googleRedirectUri = process.env.RDIR_URI;
 
-let loggedIn = false;
+let loggedIn = new Map();
 let access_token;
 app.register(fastifyCors, {
     origin: '*', // Permitir todas las conexiones (ajusta si es necesario)
@@ -37,6 +37,7 @@ app.register(fastifyCors, {
 app.register(fastifyWebSocket);
 let clients = [];
 
+//WEBSOCKET
 app.get('/ws', { websocket: true }, (connection, req) => {
     console.log('Cliente conectado');
     clients.push(connection);
@@ -46,6 +47,19 @@ app.get('/ws', { websocket: true }, (connection, req) => {
     });
 });
 
+/*LOGICA DE LOGIN CON DATABASE*/
+app.post('/api/login', (req, reply) => {
+    console.log('Solicitud de login recibida:');
+    // Aquí puedes procesar el mensaje y enviar una respuesta
+    console.log(req.body);
+    if (loggedIn)
+        reply.send({ status: 'ok' });
+    else
+        reply.send({ status: 'error' });
+});
+/*FIN DE LA LOGICA DE LOGIN CON DATABASE*/
+
+/* LOGICA OAUTH2 */
 app.get('/api/oauth', (req, reply) => {
     console.log('OAuth request received');
     reply.redirect(`https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=profile email`);
@@ -79,6 +93,8 @@ app.get('/api/callback', async (req, res) => {
         res.send('An error occurred');
     }
 });
+/*FIN DE LOGICA OAUTH2*/
+
 
 app.listen({ port, host: '0.0.0.0' }, (err, address) => {
     if (err) {
