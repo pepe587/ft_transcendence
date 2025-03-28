@@ -177,7 +177,7 @@ services:
 
 # --------------- MICRO-SERVICES --------------- #
 
-  # Node para OAuth (4001)
+  # Node para OAuth (4000)
   node-oauth:
     container_name: node-oauth
     build:
@@ -193,8 +193,9 @@ services:
       - TOKEN_URI=${TOKEN_URI}
       - AUTH_PROVIDER_X509_CERT_URL=${AUTH_PROVIDER_X509_CERT_URL}
       - CLIENT_SECRET=${CLIENT_SECRET}
+      - RDIR_URI=${RDIR_URI}
     ports:
-    - "4001:4001"
+    - "4000:4000"
     depends_on:
       redis:
         condition: service_healthy

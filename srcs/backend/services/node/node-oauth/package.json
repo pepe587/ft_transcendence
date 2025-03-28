@@ -5,6 +5,7 @@
 	"author": "jmartos-dev",
 	"main": "src/app.js",
 	"dependencies": {
+		"sqlite3": "^5.1.7",
 		"fastify": "^4.29.0",
 		"fastify-plugin": "^4.5.1",
 		"@fastify/cors": "^8.0.0",

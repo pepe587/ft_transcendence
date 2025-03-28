@@ -28,6 +28,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 const googleClientId = process.env.GCLIENT_ID;
 const googleClientSecret = process.env.CLIENT_SECRET;
 const googleRedirectUri = process.env.RDIR_URI;
+
 let loggedIn = false;
 let access_token;
 app.register(fastifyCors, {
@@ -79,7 +80,7 @@ app.get('/api/callback', async (req, res) => {
     }
 });
 
-app.listen({ port }, (err, address) => {
+app.listen({ port, host: '0.0.0.0' }, (err, address) => {
     if (err) {
         console.error(err);
         process.exit(1);

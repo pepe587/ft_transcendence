@@ -24,7 +24,7 @@ COPY src/app.js .
 
 
 # Expone el puerto en el que tu aplicación escucha
-EXPOSE 4001
+EXPOSE 4000
 
 
 # Ejecuta la aplicación
