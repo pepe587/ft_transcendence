@@ -91,6 +91,15 @@ re:
 	make fclean
 	make up
 
+oauth-re:
+	@docker rm -f node-oauth
+	@$(DC) build node-oauth
+	@$(DC) up node-oauth
+
+game-re:
+	@docker rm -f node-game
+	@$(DC) build node-game
+	@$(DC) up node-game
 
 # ============================== PRIVATE RULES ==============================
 

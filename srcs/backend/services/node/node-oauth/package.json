@@ -10,7 +10,8 @@
 		"@fastify/cors": "^8.0.0",
   		"@fastify/websocket": "^8.0.0",
   		"@fastify/oauth2": "^7.0.0",
-  		"dotenv": "^16.0.0"
+  		"dotenv": "^16.0.0",
+		"fs":"^0.0.1-security"
 	}
 }
 

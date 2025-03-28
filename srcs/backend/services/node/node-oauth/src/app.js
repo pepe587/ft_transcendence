@@ -7,11 +7,22 @@ const fastifyCors = require('@fastify/cors');
 const fastifyWebSocket = require('@fastify/websocket');
 const fastifyOauth2 = require('@fastify/oauth2');
 const dotenv = require('dotenv');
+const fs = require('fs');
 
 dotenv.config({ path: '../../.env' });
+
+const httpsOptions = {
+    key: fs.readFileSync('/etc/ssl/private/server.key'),
+    cert: fs.readFileSync('/etc/ssl/certs/server.crt')
+};
+
+// Crear servidor Fastify con HTTPS
 const app = fastify({
-    logger: true
+    logger: true,
+    https: httpsOptions
 });
+
+// Configuración de OAuth2
 app.googleOAuth2 = null;
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 const googleClientId = process.env.GCLIENT_ID;
@@ -24,6 +35,7 @@ app.register(fastifyCors, {
 });
 app.register(fastifyWebSocket);
 let clients = [];
+
 app.get('/ws', { websocket: true }, (connection, req) => {
     console.log('Cliente conectado');
     clients.push(connection);
@@ -32,10 +44,12 @@ app.get('/ws', { websocket: true }, (connection, req) => {
         clients = clients.filter(c => c !== connection);
     });
 });
+
 app.get('/api/oauth', (req, reply) => {
     console.log('OAuth request received');
     reply.redirect(`https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=profile email`);
 });
+
 app.get('/api/callback', async (req, res) => {
     console.log("\n\n\n\n\n\n\n\nHandling callback ...\n\n\n\n\n\n\n");
     let code = req.query.code;
@@ -57,13 +71,14 @@ app.get('/api/callback', async (req, res) => {
         // Redirigir a la página principal
         res.redirect('https://localhost:8443');
         loggedIn = true;
-        clients.forEach(client => client.socket.send(JSON.stringify(true)));
+        //clients.forEach(client => client.socket.send(JSON.stringify(true)));
     }
     catch (error) {
         console.error('Error during callback handling:', error);
         res.send('An error occurred');
     }
 });
+
 app.listen({ port }, (err, address) => {
     if (err) {
         console.error(err);
