@@ -1,0 +1,16 @@
+{
+	"name": "sqlite-login",
+	"version": "0.0.0",
+	"description": "Backend SQlite for logins",
+	"author": "jmartos-dev",
+	"main": "src/app.js",
+	"dependencies": {
+		"fastify": "^4.29.0",
+		"fastify-plugin": "^4.5.1",
+		"@fastify/cors": "^8.0.0",
+  		"@fastify/websocket": "^8.0.0",
+  		"@fastify/oauth2": "^7.0.0",
+  		"dotenv": "^16.0.0"
+	}
+}
+

@@ -194,8 +194,9 @@ services:
       - AUTH_PROVIDER_X509_CERT_URL=${AUTH_PROVIDER_X509_CERT_URL}
       - CLIENT_SECRET=${CLIENT_SECRET}
       - RDIR_URI=${RDIR_URI}
+      - OAUTH_PORT=${OAUTH_PORT}
     ports:
-    - "4000:4000"
+      - "${OAUTH_PORT}:${OAUTH_PORT}"
     depends_on:
       redis:
         condition: service_healthy
@@ -204,6 +205,42 @@ services:
     networks:
       - pong-net
     restart: unless-stopped
+
+  # Node para el juego (4002)
+  node-game:
+    container_name: node-game
+    build:
+      context: ./backend/services/node/node-game
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/services/node/node-game:/src
+      - node-game_data:/app/data
+    environment:
+      - ${GAME_PORT}=${GAME_PORT}
+    ports:
+      - "${GAME_PORT}:${GAME_PORT}"
+    depends_on:
+      redis:
+        condition: service_healthy
+      #gateway:
+        #condition: service_healthy
+    networks:
+      - pong-net
+    restart: unless-stopped
+
+  # SQLite para login de usuarios (4003)
+  sqlite-login:
+    container_name: sqlite-login
+    build:
+      context: ./backend/services/sqlite/sqlite-login
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/services/sqlite/sqlite-login:/src
+      - sqlite-login_data:/data
+    environment:
+      - ${LOGIN_PORT}=${LOGIN_PORT}
+    ports:
+      - "${LOGIN_PORT}:${LOGIN_PORT}"
 
   # Example (3000)
   # example:
@@ -236,7 +273,8 @@ volumes:
   alertmanager_data:
   redis_data:
   node-oauth_data:
-  # ms_example_data:
+  node-game_data:
+  sqlite-login_data:
 
 # ------------------ NETWORK ------------------- #
 
