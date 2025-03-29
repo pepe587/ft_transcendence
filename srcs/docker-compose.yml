@@ -1,5 +1,6 @@
 services:
 
+
 # ----------------- WEB SERVER ----------------- #
 
 
@@ -177,6 +178,7 @@ services:
 
 # --------------- MICRO-SERVICES --------------- #
 
+
   # Node para OAuth (4001)
   node-oauth:
     container_name: node-oauth
@@ -249,29 +251,9 @@ services:
       - pong-net
     restart: unless-stopped
 
-  # Example (3000)
-  # example:
-  #   container_name: example
-  #   build:
-  #     context: ./backend/services/example
-  #     dockerfile: Dockerfile.dev
-  #   volumes:
-  #     - ./backend/services/example/src:/app/src
-  #     - ms_example_data:/app/data
-  #   environment:
-  #     - SERVICE_URL=example:3000
-  #     - REDIS_URL=redis:6379
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
-  #     - GATEWAY_URL=http://gateway:3000
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - pong-net
-  #   restart: unless-stopped
-
 
 # ------------------ VOLUMES ------------------- #
+
 
 volumes:
   elasticsearch_data:
@@ -283,7 +265,9 @@ volumes:
   node-game_data:
   sqlite-login_data:
 
+
 # ------------------ NETWORK ------------------- #
+
 
 networks:
   pong-net:
