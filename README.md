@@ -1,5 +1,9 @@
 # ft_transcendence - Changelog
 
+## Pendiente
+- Guardar la contraseña en hash
+
+
 ## NGINX
 - Añadido proxy inverso para el frontend 'web'
 - Añadido proxy inverso para el servicio 'gateway' (comentado)

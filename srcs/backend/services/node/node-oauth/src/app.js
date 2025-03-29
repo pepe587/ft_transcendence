@@ -18,10 +18,26 @@ const app = fastify({
 });
 
 // Cargar configuración y módulos
-const db  = require('./config/database');
+
+// Funciones de la base de datos
+    const db  = require('./config/database');
+    const { getAllUsers } = require('./config/database');
+    const { insertUser } = require('./config/database');
+    const { closeDatabase } = require('./config/database');
+
+    //TO DO:
+    //const { getUserById } = require('./config/database');
+    //const { updateUser } = require('./config/database');
+    //const { deleteUser } = require('./config/database');
+    //const { getUserByUsername } = require('./config/database');
+    //const { getUserByEmail } = require('./config/database');
+
 const websocket = require('./plugins/websocket');
-const authRoutes = require('./routes/auth');
-const loginRoutes = require('./routes/login');
+
+// Rutas
+    const authRoutes = require('./routes/auth');
+    const loginRoutes = require('./routes/login');
+    const usersRoutes = require('./routes/users');
 
 // Registrar plugins y rutas
 app.register(require('@fastify/cors'), { origin: '*' });
@@ -29,6 +45,7 @@ app.register(require('@fastify/websocket'));
 app.register(websocket);
 app.register(authRoutes);
 app.register(loginRoutes);
+app.register(usersRoutes);
 
 // Iniciar servidor
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;

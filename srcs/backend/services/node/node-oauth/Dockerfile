@@ -1,8 +1,6 @@
 # Usamos imagen oficial de Node.js
 FROM node:latest
 
-# Establece el directorio de trabajo dentro del contenedor
-#WORKDIR /src
 
 # Copia solo los archivos necesarios para instalar dependencias
 COPY package.json .
@@ -13,15 +11,20 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -out /etc/ssl/certs/server.crt \
     -subj "/C=ES/ST=Andalucia/L=Malaga/O=42 Malaga/OU=Formacion/CN=localhost"
 
-RUN ls / >&2
 
 # Instala las dependencias
 RUN npm install
 
 
 # Copia el resto de los archivos del proyecto
-COPY src/app.js .
+COPY src/ .
 
+#RUN ls -R /config >&2
+#RUN cat /config/database.js >&2 && exit 1
+
+
+# Establece el directorio de trabajo dentro del contenedor
+#WORKDIR /src
 
 # Expone el puerto en el que tu aplicación escucha
 EXPOSE 4000
