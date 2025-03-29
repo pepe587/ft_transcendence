@@ -21,15 +21,15 @@ const Register = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password, username }),
+          body: JSON.stringify({ username, email, password }),
         });
         if (!response.ok) {
           throw new Error('Error al registrar el usuario');
         }
         console.log('Cuenta creada exitosamente');
-        // Aquí podrías redirigir al usuario al login
+        // Con este catch de "error" podemos poner el mensaje que queramos si algo no va bien o redirigirlo a otra pagina
       } catch (error) {
-        setError('Error al registrar el usuario');
+        setError(error);
       }
     } else {
       setError('Por favor, completa todos los campos');
