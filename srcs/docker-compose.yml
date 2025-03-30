@@ -1,181 +1,54 @@
 services:
+  # ----------------- WEB SERVER (80, 443) ----------------- #
 
-# ----------------- WEB SERVER ----------------- #
-
-
-  # Nginx (80, 443 & 9113)
   nginx:
     container_name: nginx
     build:
       context: ./frontend/nginx
+      args:
+        - HOST_NAME=${HOST_NAME-localhost}
     ports:
       - "8443:443"
     networks:
-      - pong-net
+      - public-net
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
-  # Web (3000)
+  # --------------------- WEB PAGE (80) -------------------- #
+
   web:
     container_name: web
-    build: 
+    build:
       context: ./frontend/web
       dockerfile: Dockerfile.dev
     volumes:
       - ./frontend/web/src:/app/src
       - ./frontend/web/public:/app/public
     networks:
-      - pong-net
+      - public-net
     restart: unless-stopped
 
+  # --------------------- REDIS (6379) --------------------- #
 
-# ------------------- LOGGING ------------------ #
-
-
-  # ElasticSearch (9200 & 9114)
-  elasticsearch:
-    container_name: elasticsearch
-    build:
-      context: ./backend/logging/elasticsearch
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=true
-      - logger.level=ERROR
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
-    healthcheck:
-      test: ["CMD", "bash", "-c", "curl -f -u $$ELASTICSEARCH_USERNAME:$$ELASTICSEARCH_PASSWORD http://localhost:9200/_cluster/health?wait_for_status=yellow\\&timeout=30s"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-  # LogStash (5044)
-  logstash:
-    container_name: logstash
-    build:
-      context: ./backend/logging/logstash
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-  # Kibana (5601)
-  kibana:
-    container_name: kibana
-    build:
-      context: ./backend/logging/kibana
-    environment:
-      - SERVER_BASEPATH=/kibana
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - SERVER_PUBLICBASEURL=${HOST_NAME-https://localhost}/kibana
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME-${ADMIN_USERNAME}}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD-${ADMIN_PASSWORD}}
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-
-# ------------------- METRICS ------------------ #
-
-
-  # Prometheus (9090)
-  prometheus:
-    container_name: prometheus
-    build:
-      context: ./backend/metrics/prometheus
-    volumes:
-      - prometheus_data:/prometheus
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-  # Grafana (3000)
-  grafana:
-    container_name: grafana
-    build:
-      context: ./backend/metrics/grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SERVER_ROOT_URL=${HOST_NAME-https://localhost}/grafana
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME-${ADMIN_USERNAME}}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD-${ADMIN_PASSWORD}}
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-  # AlertManager (9093)
-  alertmanager:
-    container_name: alertmanager
-    build:
-      context: ./backend/metrics/alertmanager
-    volumes:
-      - alertmanager_data:/alertmanager
-    networks:
-      - pong-net
-    restart: unless-stopped
-
-
-# --------------- REDIS & GATEWAY --------------- #
-
-
-  # Redis (6379)
-   
   redis:
     container_name: redis
     image: redis:7.4.2
     volumes:
       - redis_data:/data
-    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD-${ADMIN_PASSWORD}}
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD-${ADMIN_PASSWORD}}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 10s
     networks:
-      - pong-net
+      - service-net
     restart: unless-stopped
 
-
-  # Gateway (3000)
-  # gateway:
-  #   container_name: gateway
-  #   build:
-  #     context: ./backend/gateway
-  #     dockerfile: Dockerfile.dev
-  #   volumes:
-  #     - ./backend/gateway/src:/app/src
-  #   environment:
-  #     - SERVICE_URL=gateway:3000
-  #     - LOGSTASH_URL=logstash:5044
-  #     - REDIS_URL=redis:6379
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
-  #     - EXAMPLE_SERVICE_URL=http://example:3000
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - pong-net
-
-
-# --------------- MICRO-SERVICES --------------- #
+  # --------------- MICRO-SERVICES --------------- #
 
   # Node para OAuth (4000)
   node-oauth:
@@ -203,10 +76,9 @@ services:
         condition: service_healthy
       sqlite-login:
         condition: service_started
-      #gateway:
-        #condition: service_healthy
     networks:
-      - pong-net
+      - public-net
+      - service-net
     restart: unless-stopped
 
   # Node para el juego (4002)
@@ -225,10 +97,9 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      #gateway:
-        #condition: service_healthy
     networks:
-      - pong-net
+      - public-net
+      - service-net
     restart: unless-stopped
 
   # SQLite para login de usuarios (4003)
@@ -245,44 +116,22 @@ services:
     ports:
       - "${LOGIN_PORT}:${LOGIN_PORT}"
     networks:
-      - pong-net
+      - service-net
 
-  # Example (3000)
-  # example:
-  #   container_name: example
-  #   build:
-  #     context: ./backend/services/example
-  #     dockerfile: Dockerfile.dev
-  #   volumes:
-  #     - ./backend/services/example/src:/app/src
-  #     - ms_example_data:/app/data
-  #   environment:
-  #     - SERVICE_URL=example:3000
-  #     - REDIS_URL=redis:6379
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD-${ADMIN_PASSWORD}}
-  #     - GATEWAY_URL=http://gateway:3000
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - pong-net
-  #   restart: unless-stopped
-
-
-# ------------------ VOLUMES ------------------- #
+# ------------------------- VOLUMES ------------------------ #
 
 volumes:
-  elasticsearch_data:
-  prometheus_data:
-  grafana_data:
-  alertmanager_data:
   redis_data:
   node-oauth_data:
   node-game_data:
   sqlite-login_data:
 
-# ------------------ NETWORK ------------------- #
+# ------------------------- NETWORK ------------------------ #
 
 networks:
-  pong-net:
-    name: pong-net
+  public-net:
+    name: public-net
+    driver: bridge
+  service-net:
+    name: service-net
+    driver: bridge

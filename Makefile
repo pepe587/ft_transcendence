@@ -106,22 +106,12 @@ game-re:
 
 # Remove volumes (private rule)
 _remove_volumes:
-	@docker volume rm srcs_elasticsearch_data > /dev/null 2>&1 || true
-	@docker volume rm srcs_prometheus_data > /dev/null 2>&1 || true
-	@docker volume rm srcs_grafana_data > /dev/null 2>&1 || true
-	@docker volume rm srcs_alertmanager_data > /dev/null 2>&1 || true
 	@docker volume rm srcs_redis_data > /dev/null 2>&1 || true
 
 # Remove images (private rule)
 _remove_images:
 	@docker rmi srcs-nginx > /dev/null 2>&1 || true
 	@docker rmi srcs-web > /dev/null 2>&1 || true
-	@docker rmi srcs-elasticsearch > /dev/null 2>&1 || true
-	@docker rmi srcs-logstash > /dev/null 2>&1 || true
-	@docker rmi srcs-kibana > /dev/null 2>&1 || true
-	@docker rmi srcs-prometheus > /dev/null 2>&1 || true
-	@docker rmi srcs-grafana > /dev/null 2>&1 || true
-	@docker rmi srcs-alertmanager > /dev/null 2>&1 || true
 	@docker rmi redis:7.4.2 > /dev/null 2>&1 || true
 
 .PHONY: all up down restart build rebuild iclean vclean clean fclean _remove_images _remove_volumes

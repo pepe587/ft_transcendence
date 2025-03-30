@@ -1,128 +1,46 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
+const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800 backdrop-blur-sm bg-opacity-90">
-      <div className="container-custom py-4">
-        <div className="flex items-center justify-between">
+    <header className="bg-gray-800 border-b border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <span className="text-xl font-bold text-white">FT</span>
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-100">
-              Transcendence
-            </span>
+          <Link to="/" className="text-2xl font-bold text-white">
+            Transcendence
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <NavLinks />
-            <div className="flex items-center space-x-4">
-              <Link to="/login" className="btn-secondary">
-                Login
-              </Link>
-              <Link to="/register" className="btn-primary">
-                Register
-              </Link>
-            </div>
+          {/* Navegación */}
+          <nav className="flex space-x-4">
+            <Link
+              to="/jugar"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Jugar
+            </Link>
+            <Link
+              to="/ranking"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Ranking
+            </Link>
+            <Link
+              to="/login"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Login
+            </Link>
+            <Link
+              to="/registro"
+              className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+            >
+              Registro
+            </Link>
           </nav>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-gray-100 focus:outline-none" 
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <nav className="md:hidden py-4 space-y-4">
-            <MobileNavLinks closeMenu={() => setIsMenuOpen(false)} />
-            <div className="flex flex-col space-y-3 pt-4 border-t border-gray-800">
-              <Link 
-                to="/login" 
-                className="btn-secondary w-full text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <Link 
-                to="/register" 
-                className="btn-primary w-full text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Register
-              </Link>
-            </div>
-          </nav>
-        )}
       </div>
     </header>
-  );
-};
-
-const NavLinks = () => {
-  return (
-    <>
-      <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-        Home
-      </Link>
-      <Link to="/game" className="text-gray-300 hover:text-white transition-colors">
-        Game
-      </Link>
-      <Link to="/leaderboard" className="text-gray-300 hover:text-white transition-colors">
-        Leaderboard
-      </Link>
-      <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-        About
-      </Link>
-    </>
-  );
-};
-
-const MobileNavLinks = ({ closeMenu }: { closeMenu: () => void }) => {
-  return (
-    <>
-      <Link 
-        to="/" 
-        className="block text-gray-300 hover:text-white transition-colors py-2"
-        onClick={closeMenu}
-      >
-        Home
-      </Link>
-      <Link 
-        to="/game" 
-        className="block text-gray-300 hover:text-white transition-colors py-2"
-        onClick={closeMenu}
-      >
-        Game
-      </Link>
-      <Link 
-        to="/leaderboard" 
-        className="block text-gray-300 hover:text-white transition-colors py-2"
-        onClick={closeMenu}
-      >
-        Leaderboard
-      </Link>
-      <Link 
-        to="/about" 
-        className="block text-gray-300 hover:text-white transition-colors py-2"
-        onClick={closeMenu}
-      >
-        About
-      </Link>
-    </>
   );
 };
 

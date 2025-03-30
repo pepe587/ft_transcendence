@@ -1,8 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import Login from './pages/Login';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Header from "./components/layout/Header";
 
 function App() {
   return (
@@ -16,7 +15,6 @@ function App() {
             {/* Add more routes here as needed */}
           </Routes>
         </main>
-        <Footer />
       </div>
     </Router>
   );
