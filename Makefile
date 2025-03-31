@@ -107,12 +107,18 @@ game-re:
 # Remove volumes (private rule)
 _remove_volumes:
 	@docker volume rm srcs_redis_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_nginx_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_web_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_node-oauth_data > /dev/null 2>&1 || true
+	@docker volume rm srcs_node-game_data > /dev/null 2>&1 || true
 
 # Remove images (private rule)
 _remove_images:
 	@docker rmi srcs-nginx > /dev/null 2>&1 || true
 	@docker rmi srcs-web > /dev/null 2>&1 || true
 	@docker rmi redis:7.4.2 > /dev/null 2>&1 || true
+	@docker rmi node-oauth > /dev/null 2>&1 || true
+	@docker rmi node-game > /dev/null 2>&1 || true
 
 .PHONY: all up down restart build rebuild iclean vclean clean fclean _remove_images _remove_volumes
 
