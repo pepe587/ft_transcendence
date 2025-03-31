@@ -5,16 +5,16 @@ const path = require("path");
 
 dotenv.config({ path: "../../.env" });
 
-// Opciones de HTTPS
-const httpsOptions = {
-  key: fs.readFileSync("/etc/ssl/private/server.key"),
-  cert: fs.readFileSync("/etc/ssl/certs/server.crt"),
-};
+// Opciones de HTTPS (PRANDO-A COMENTÓ ESTO)
+//const httpsOptions = {
+//  key: fs.readFileSync("/etc/ssl/private/server.key"),
+//  cert: fs.readFileSync("/etc/ssl/certs/server.crt"),
+//};
 
 // Crear el servidor Fastify
 const app = fastify({
   logger: true,
-  https: httpsOptions,
+  //https: httpsOptions, // (PRANDO-A COMENTÓ ESTO)
 });
 
 // Cargar configuración y módulos
