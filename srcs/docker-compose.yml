@@ -55,9 +55,9 @@ services:
     container_name: node-oauth
     build:
       context: ./backend/services/node/node-oauth
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
-      - ./backend/services/node/node-oauth:/src
+      - ./backend/services/node/node-oauth/src:/app/src
       - node-oauth_data:/app/data
       - sqlite-login_data:/data # Para SQLite
     environment:

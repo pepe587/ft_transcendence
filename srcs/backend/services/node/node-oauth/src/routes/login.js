@@ -14,7 +14,7 @@ module.exports = async function (app) {
     });
   });
 
-  app.post("/api/login", (req, reply) => {
+  app.post("/login", (req, reply) => {
     console.log("🔐 Solicitud de login recibida");
     console.log(`\n\n\n\n`);
     console.log(req.body.email);

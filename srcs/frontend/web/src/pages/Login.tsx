@@ -1,42 +1,40 @@
-import { Link } from 'react-router-dom';
-import { ChevronRight, Users, Trophy, Zap, BarChart } from 'lucide-react';
-import { useState } from 'react';
+import { Link } from "react-router-dom";
+import { ChevronRight, Users, Trophy, Zap, BarChart } from "lucide-react";
+import { useState } from "react";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     if (email && password) {
-
       try {
-        await fetch('https://localhost:4000/api/login', {
-          method: 'POST',
+        await fetch("/api/oauth/login", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
         });
-      }
-      catch (error) {
-        setError('Usuario o contraseña incorrectos');
+      } catch (error) {
+        setError("Usuario o contraseña incorrectos");
         return;
       }
-      console.log('Iniciando sesión...');
+      console.log("Iniciando sesión...");
       // Aquí iría la lógica de autenticación
     } else {
-      setError('Por favor, ingresa tu correo y contraseña');
+      setError("Por favor, ingresa tu correo y contraseña");
     }
   };
 
   const handleGoogleLogin = () => {
-    console.log('Iniciando sesión con Google...');
+    console.log("Iniciando sesión con Google...");
     try {
-        // Redirect the user to the Google OAuth login page
-        window.location.href = 'https://localhost:4000/api/oauth';
+      // Redirect the user to the Google OAuth login page
+      window.location.href = "/api/oauth/oauth/";
     } catch (error) {
-        console.error('Redirect error:', error);
+      console.error("Redirect error:", error);
     }
   };
 
@@ -66,7 +64,10 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm text-gray-300 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm text-gray-300 mb-2"
+            >
               Contraseña
             </label>
             <input
@@ -80,7 +81,10 @@ const Login = () => {
           </div>
 
           <div className="flex justify-end">
-            <Link to="/forgot-password" className="text-indigo-400 text-sm hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-indigo-400 text-sm hover:underline"
+            >
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
@@ -105,7 +109,10 @@ const Login = () => {
 
         <div className="mt-6 text-center">
           <span className="text-gray-400 text-sm">¿No tienes cuenta? </span>
-          <Link to="/register" className="text-indigo-400 text-sm hover:underline">
+          <Link
+            to="/register"
+            className="text-indigo-400 text-sm hover:underline"
+          >
             Regístrate
           </Link>
         </div>

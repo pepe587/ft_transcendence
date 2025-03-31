@@ -1,1 +1,24 @@
-# Este es el dockerfile de desarrollo. Se ejecuta nodemon
+# Alpine es mas ligero
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instala nodemon
+RUN npm install -g nodemon
+
+# Crea las dependencias en el contenedor
+COPY package*.json ./
+RUN npm install
+
+# Copia los archivos del proyecto
+COPY . .
+
+# Modo desarrollo
+ENV NODE_ENV=development
+ENV LOG_LEVEL=debug
+
+# Nodemon
+EXPOSE 4000
+
+# Inicia nodemon
+CMD ["nodemon", "--watch", "./", "--ext", "js,json", "--ignore", "node_modules/", "--ignore", "dist/", "--legacy-watch", "src/app.js"]
