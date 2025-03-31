@@ -33,7 +33,7 @@ const Login = () => {
     console.log("Iniciando sesión con Google...");
     try {
       // Redirect the user to the Google OAuth login page
-      window.location.href = "/api/oauth/oauth/";
+      window.location.href = "/api/oauth/oauth";
     } catch (error) {
       console.error("Redirect error:", error);
     }
