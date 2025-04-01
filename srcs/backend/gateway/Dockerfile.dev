@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install nodemon for hot-reloading
+RUN npm install -g nodemon 
+
+# Install project dependencies
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["nodemon", "--watch", "./", "--ext", "js,json", "--ignore", "node_modules/", "--ignore", "dist/", "--legacy-watch", "src/app.js"]
