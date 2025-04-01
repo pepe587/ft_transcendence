@@ -15,11 +15,9 @@ module.exports = async function (app) {
   });
 
   app.post("/login", (req, reply) => {
+    console.log(`\n-------------------------------\n`);
     console.log("🔐 Solicitud de login recibida");
-    console.log(`\n\n\n\n`);
-    console.log(req.body.email);
     console.log(req.body);
-    console.log(`\n\n\n\n`);
 
     //enviar datos a la base de datos
     const query = "SELECT * FROM users WHERE username = ? AND password = ?";
@@ -28,7 +26,7 @@ module.exports = async function (app) {
         console.error("❌ Error al obtener usuario:", err.message);
         reply.status(500).send({ error: "Error al obtener usuario" });
       } else if (row) {
-        loggedIn.set(req.body.username, true);
+        loggedIn.set(req.body.email, true);
         console.log("✅ Usuario autenticado");
         reply.send({ status: "ok" });
       } else {
@@ -36,5 +34,6 @@ module.exports = async function (app) {
         reply.send({ status: "error" });
       }
     });
+  console.log(`\n-------------------------------\n`);
   });
 };

@@ -10,12 +10,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.error('❌ No se pudo conectar a la base de datos:', err.message);
     } else {
         console.log('✅ Conectado a la base de datos SQLite.');
+        console.log(`\tRuta de la base de datos: ${dbPath}`);
     }
+    console.log(`\n-------------------------------\n`);
 });
 
-// Función para obtener todos los usuarios
-// curl -k https://localhost:4000/api/users | jq
+// Función para obtener todos los usuarios. TEST
 function getAllUsers(callback) {
+    console.log(`\n-------------------------------\n`);
+    console.log('🔍 Obteniendo todos los usuarios...');
     const query = 'SELECT * FROM users';
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -25,6 +28,7 @@ function getAllUsers(callback) {
             callback(null, rows);
         }
     });
+    console.log(`\n-------------------------------\n`);
 }
 
 function insertUser(username, password, callback) {

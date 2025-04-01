@@ -1,3 +1,5 @@
+const { access } = require("fs");
+
 module.exports = async function (app) {
   const googleClientId = process.env.GCLIENT_ID;
   const googleClientSecret = process.env.CLIENT_SECRET;
@@ -14,6 +16,7 @@ module.exports = async function (app) {
   });
 
   app.get("/callback", async (req, res) => {
+    console.log(`\n-------------------------------`);
     console.log("\nHandling OAuth2 callback...");
     let code = req.query.code;
 
@@ -32,7 +35,10 @@ module.exports = async function (app) {
 
       const responseBody = JSON.parse(response.body);
       access_token = responseBody.access_token;
-      console.log(`✅ Access token received`);
+      console.log(`✅ Access token received\n`);
+      console.log(responseBody);
+      console.log(`Access Token: ${access_token}`);
+      console.log(`\n-------------------------------\n`);
 
       loggedIn.set(code, true);
 
