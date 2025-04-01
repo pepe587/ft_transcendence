@@ -19,6 +19,13 @@ const config = {
       timeout: 5000,
     },
   },
+
+  // SQLite
+  database: {
+    path: "./data/stats.sqlite",
+    operationTimeout: 5000,
+  },
+
 };
 
 module.exports = config;
