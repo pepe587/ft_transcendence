@@ -32,7 +32,7 @@ const Header: React.FC = () => {
               Login
             </Link>
             <Link
-              to="/registro"
+              to="/signup"
               className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
             >
               Registro
