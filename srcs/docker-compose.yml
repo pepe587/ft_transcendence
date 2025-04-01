@@ -4,16 +4,13 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: ./frontend/nginx
+      context: ./backend/nginx
       args:
         - HOST_NAME=${HOST_NAME-localhost}
     ports:
       - "8443:443"
     networks:
       - public-net
-    depends_on:
-      redis:
-        condition: service_healthy
     restart: unless-stopped
 
   # --------------------- WEB PAGE (80) -------------------- #
@@ -24,107 +21,87 @@ services:
       context: ./frontend/web
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend/web/src:/app/src
-      - ./frontend/web/public:/app/public
+      - ./frontend/web:/app
     networks:
       - public-net
     restart: unless-stopped
 
-  # --------------------- REDIS (6379) --------------------- #
+  # -------------------- GATEWAY (3000) -------------------- #
 
-  redis:
-    container_name: redis
-    image: redis:7.4.2
+  gateway:
+    container_name: gateway
+    build:
+      context: ./backend/gateway
+      dockerfile: Dockerfile.dev
     volumes:
-      - redis_data:/data
-    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD}
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
+      - ./backend/gateway/src:/app/src
+    environment:
+      - SERVICE_URL=gateway:3000
+      - CORS_ORIGIN=${CORS_ORIGIN-*}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL-http://oauth:4000}
+      - GAME_SERVICE_URL=${GAME_SERVICE_URL-http://game:4002}
     networks:
+      - public-net
       - service-net
     restart: unless-stopped
 
   # --------------- MICRO-SERVICES --------------- #
 
-  # Node para OAuth (4000)
-  node-oauth:
-    container_name: node-oauth
+  # Stats (4000)
+  stats:
+    container_name: stats
     build:
-      context: ./backend/services/node/node-oauth
+      context: ./backend/services/stats
       dockerfile: Dockerfile.dev
     volumes:
-      - ./backend/services/node/node-oauth/src:/app/src
-      - node-oauth_data:/app/data
-      - sqlite-login_data:/data # Para SQLite
+      - ./backend/services/stats/src:/app/src
+      - ms_stats_data:/app/data
     environment:
-      - GCLIENT_ID=${GCLIENT_ID}
-      - PROJECT_ID=${PROJECT_ID}
-      - AUTH_URI=${AUTH_URI}
-      - TOKEN_URI=${TOKEN_URI}
-      - AUTH_PROVIDER_X509_CERT_URL=${AUTH_PROVIDER_X509_CERT_URL}
-      - CLIENT_SECRET=${CLIENT_SECRET}
-      - RDIR_URI=${RDIR_URI}
-      - OAUTH_PORT=${OAUTH_PORT}
-    ports:
-      - "${OAUTH_PORT}:${OAUTH_PORT}"
-    depends_on:
-      redis:
-        condition: service_healthy
-      sqlite-login:
-        condition: service_started
+      - SERVICE_URL=game:4000
     networks:
-      - public-net
       - service-net
     restart: unless-stopped
 
-  # Node para el juego (4002)
-  node-game:
-    container_name: node-game
+  # OAuth (4000)
+  oauth:
+    container_name: oauth
     build:
-      context: ./backend/services/node/node-game
-      dockerfile: Dockerfile
+      context: ./backend/services/oauth
+      dockerfile: Dockerfile.dev
     volumes:
-      - ./backend/services/node/node-game:/src
-      - node-game_data:/app/data
+      - ./backend/services/oauth/src:/app/src
     environment:
-      - ${GAME_PORT}=${GAME_PORT}
-    ports:
-      - "${GAME_PORT}:${GAME_PORT}"
-    depends_on:
-      redis:
-        condition: service_healthy
+      - SERVICE_URL=oauth:4000
+      - STATS_URL=stats:4000
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CLIENT_REDIRECT=${GOOGLE_CLIENT_REDIRECT}
+      - FORTYTWO_CLIENT_ID=${FORTYTWO_CLIENT_ID}
+      - FORTYTWO_CLIENT_SECRET=${FORTYTWO_CLIENT_SECRET}
+      - FORTYTWO_CLIENT_REDIRECT=${FORTYTWO_CLIENT_REDIRECT}
     networks:
-      - public-net
       - service-net
     restart: unless-stopped
 
-  # SQLite para login de usuarios (4003)
-  sqlite-login:
-    container_name: sqlite-login
+  # Game (4002)
+  game:
+    container_name: game
     build:
-      context: ./backend/services/sqlite/sqlite-login
+      context: ./backend/services/game
       dockerfile: Dockerfile
     volumes:
-      - ./backend/services/sqlite/sqlite-login:/src
-      - sqlite-login_data:/data
+      - ./backend/services/game/src:/app/src
     environment:
-      - ${LOGIN_PORT}=${LOGIN_PORT}
-    ports:
-      - "${LOGIN_PORT}:${LOGIN_PORT}"
+      - SERVICE_URL=game:4002
+      - STATS_URL=stats:4000
     networks:
       - service-net
+    restart: unless-stopped
 
 # ------------------------- VOLUMES ------------------------ #
 
 volumes:
-  redis_data:
-  node-oauth_data:
-  node-game_data:
-  sqlite-login_data:
+  ms_stats_data:
 
 # ------------------------- NETWORK ------------------------ #
 

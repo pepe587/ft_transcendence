@@ -1,0 +1,15 @@
+{
+	"name": "stats",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Stats microservice",
+	"author": "vzurera-",
+	"main": "src/app.js",
+	"dependencies": {
+		"fastify": "^5.2.2",
+		"fastify-plugin": "^5.0.1",
+		"better-sqlite3": "^11.9.1",
+    	"dotenv": "^16.4.7"
+	}
+}
+
